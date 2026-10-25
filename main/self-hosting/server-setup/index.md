@@ -43,6 +43,8 @@ ATUIN_OPEN_REGISTRATION=true
 ATUIN_DB_URI="postgres://user:password@hostname/database"
 ```
 
+An `ATUIN_*` environment variable overrides the same key in `server.toml`. An empty one, such as `ATUIN_DB_URI=` left in a compose file, counts as unset. `ATUIN_PORT` in the `tcp://10.96.0.12:8888` form, which Kubernetes sets for a Service named `atuin`, is ignored with a warning; see [Kubernetes](https://docs.atuin.sh/self-hosting/kubernetes/#service-links).
+
 | Parameter           | Description                                                                |
 | ------------------- | -------------------------------------------------------------------------- |
 | `db_uri`            | A valid database URI, for saving history (required, no default)            |
@@ -115,6 +117,25 @@ ATUIN_DB_PASSWORD_FILE="/run/secrets/atuin_db_password"
 ```
 
 Trailing newlines in the file are ignored, and the rest is used as-is, so unlike a password in `db_uri` it doesn't need escaping. `db_uri` must name the host, and must not contain a password as well. This works with PostgreSQL and MySQL; SQLite has no password.
+
+## Administration
+
+`atuin-server` supports some administration tools.
+
+### User Management
+
+While `open_registration` is `true`, anyone who can reach the server can register. To keep a server private, leave it `false` and create accounts on the server instead:
+
+```
+atuin-server admin user create --email alice@example.com alice
+```
+
+You can also delete users as well as change their passwords.
+
+```
+atuin-server admin user set-password alice
+atuin-server admin user delete alice
+```
 
 ## TLS
 
